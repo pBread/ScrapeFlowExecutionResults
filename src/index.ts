@@ -1,5 +1,5 @@
 import dotenv from "dotenv";
-import _, { toInteger } from "lodash";
+import _ from "lodash";
 import { pRateLimit } from "p-ratelimit";
 import twilio from "twilio";
 
@@ -89,16 +89,7 @@ async function getExecutionResult(flowSid: string, executionSid: string) {
 }
 
 async function getFlows() {
-  return limit(
-    async () =>
-      await client.studio.flows
-        .list()
-        .then((flows) =>
-          flows.filter(
-            (flow) => flow.sid === "FW8abdd988a49910442e03eca1d61d5a38"
-          )
-        )
-  );
+  return limit(async () => await client.studio.flows.list());
 }
 
 async function getFlowExecutionSids(flowSid: string) {
