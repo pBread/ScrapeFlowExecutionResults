@@ -1,7 +1,10 @@
 import dotenv from "dotenv";
+import fs from "fs";
 import _ from "lodash";
 import { pRateLimit } from "p-ratelimit";
+import path from "path";
 import twilio from "twilio";
+import { table } from "table";
 
 dotenv.config();
 
@@ -16,7 +19,6 @@ const limit = pRateLimit({
 });
 
 let flowsCompleted = 0;
-let requestsInProgress = 0;
 
 (async () => {
   const data = {};
@@ -27,17 +29,14 @@ let requestsInProgress = 0;
   function log() {
     console.clear();
     console.log(
-      Object.entries({
-        numberOfFlows,
-        flowsCompleted,
-        requestsInProgress,
-        completionPercent:
+      table([
+        ["Number of Flows", "Flows Completed", "Completion Percent"],
+        [
+          numberOfFlows,
+          flowsCompleted,
           ((flowsCompleted / numberOfFlows) * 100).toFixed(2) + "%",
-      }).reduce(
-        (acc, [key, value]) =>
-          Object.assign(acc, { [_.startCase(key)]: value }),
-        {}
-      )
+        ],
+      ])
     );
   }
 
@@ -55,7 +54,20 @@ let requestsInProgress = 0;
     })
   );
 
-  console.log(data);
+  const csvArray = toCsvArray(Object.values(data));
+
+  // save results file
+  try {
+    fs.mkdirSync("output");
+  } catch (error) {}
+
+  fs.writeFileSync(
+    path.join("output", new Date().toISOString() + ".csv"),
+    csvArray.map((row) => row.join(",")).join("\n")
+  );
+
+  // print results
+  console.log(table(csvArray));
 })();
 
 async function aggregateFlowResults(flowSid: string, flowName: string) {
@@ -67,14 +79,16 @@ async function aggregateFlowResults(flowSid: string, flowName: string) {
     try {
       const result = await getExecutionResult(flowSid, executionSid);
 
-      if (_.has(counter, result)) counter[result]++;
-      else counter[result] = 1;
+      const resultKey = result ? `Pressed ${result}` : "Pressed Nothing";
+
+      if (_.has(counter, resultKey)) counter[resultKey]++;
+      else counter[resultKey] = 1;
     } catch (error) {}
   }
 
   return Object.assign(counter, {
-    _total: _.sum(Object.values(counter)),
-    flowName,
+    total: _.sum(Object.values(counter)),
+    "Flow Name": flowName,
   });
 }
 
@@ -111,4 +125,28 @@ async function getFlowExecutionWidgets(flowSid: string, executionSid: string) {
       .fetch()
       .then(({ context }) => context.widgets)
   );
+}
+
+function toCsvArray(docs: { [key: string]: any }[]) {
+  const keySet = new Set();
+  for (const doc of docs) for (const key of Object.keys(doc)) keySet.add(key);
+
+  const keys = [...keySet].sort();
+
+  let rows = [keys];
+
+  for (let i = 0; i < docs.length; i++) {
+    const doc = docs[i];
+    let row = [];
+
+    for (let j = 0; j < keys.length; j++) row[j] = undefined;
+
+    for (const key in doc) {
+      row[keys.indexOf(key)] = doc[key];
+    }
+
+    rows[i + 1] = row;
+  }
+
+  return rows;
 }
