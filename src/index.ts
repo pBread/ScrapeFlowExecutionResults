@@ -139,7 +139,7 @@ function toCsvArray(docs: { [key: string]: any }[]) {
     const doc = docs[i];
     let row = [];
 
-    for (let j = 0; j < keys.length; j++) row[j] = undefined;
+    for (let j = 0; j < keys.length; j++) row[j] = "";
 
     for (const key in doc) {
       row[keys.indexOf(key)] = doc[key];
