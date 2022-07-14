@@ -56,7 +56,7 @@ async function getExecutionResult(flowSid: string, executionSid: string) {
     .then(({ context }) => context.widgets);
 
   const gatherWidget: { Digits?: string } = Object.values(widgets).find(
-    (widget) => _.has(widget, "Digits")
+    (widget) => _.has(widget, "Digits") // widgets that has "Digits" property is a Gather widget. This code assumes there is only one Gather widget in the flow.
   );
 
   return gatherWidget?.Digits || null;
