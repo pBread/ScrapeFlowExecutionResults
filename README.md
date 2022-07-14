@@ -1,6 +1,6 @@
 ## Usage & Limitations
 
-This repository aggregates the execution Gather results of every flow in your Twilio account. _Note, we assume each Studio Flow only has one Gather widget. If you have multiple Gather widgets in a Studio Flow, it will return the results of the first widget and the results may be inaccurate._
+This repository aggregates the user inputs from every Studio Flow in your Twilio account. _Note, we assume each Studio Flow only has one Gather widget. If you have multiple Gather widgets in a Studio Flow, it will return the results of the first widget and the results may be inaccurate._
 
 ## Setup
 
