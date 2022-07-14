@@ -3,8 +3,8 @@ import fs from "fs";
 import _ from "lodash";
 import { pRateLimit } from "p-ratelimit";
 import path from "path";
-import twilio from "twilio";
 import { table } from "table";
+import twilio from "twilio";
 
 dotenv.config();
 
