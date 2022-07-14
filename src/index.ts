@@ -30,10 +30,10 @@ let flowsCompleted = 0;
     console.clear();
     console.log(
       table([
-        ["Number of Flows", "Flows Completed", "Completion Percent"],
+        ["Flows Completed", "Number of Flows", "Completion Percent"],
         [
-          numberOfFlows,
           flowsCompleted,
+          numberOfFlows,
           ((flowsCompleted / numberOfFlows) * 100).toFixed(2) + "%",
         ],
       ])
